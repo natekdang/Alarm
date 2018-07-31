@@ -63,7 +63,7 @@ int compareTimeArray(char array[])
 	{
 		return 1;  
 	}
-	else if (strcmp(array, "112400") == 0) //TEST BRANCH
+	else if (strcmp(array, "123000") == 0) //TEST BRANCH
 	{
 		return 1; 
 	}
@@ -82,8 +82,8 @@ void TickFct()
 
 	//serial variables
 	HANDLE hComm;
-	char onBuffer[]				= "On\r";
-	char offBuffer[]			= "Off\r";
+	char onBuffer[]				= "ON\r";
+	char offBuffer[]			= "OFF\r";
 	BOOL Status; 
 	DWORD onBytesToWrite;
 	DWORD onBytesWritten		= 0; 
@@ -101,7 +101,7 @@ void TickFct()
 			if (compareTimeArray(array))
 			{
 				count = 0; 
-				printf("ON TEST\r\n");
+				printf("ON TEST\n");
 
 				//*********OPEN SERIAL PORT
 				hComm = CreateFile(_T("COM3"),							//port name
@@ -127,7 +127,7 @@ void TickFct()
 
 				if (Status == FALSE)
 				{
-					printf("Error in GetCommState()");
+					printf("Error in GetCommState()\n");
 				}
 				dcbParameters.BaudRate	= CBR_115200;
 				dcbParameters.ByteSize	= 8;
@@ -137,7 +137,7 @@ void TickFct()
 				Status = SetCommState(hComm, &dcbParameters);  //Configuring the port according to settings in DCB 
 				if (Status == FALSE)
 				{
-					printf("Error in Setting DCB Structure");
+					printf("Error in Setting DCB Structure\n");
 				}
 
 				//************SET TIMEOUTS
@@ -149,7 +149,7 @@ void TickFct()
 
 				if (SetCommTimeouts(hComm, &timeouts) == FALSE)
 				{
-					printf("Error in Setting Time Outs");
+					printf("Error in Setting Time Outs\n");
 				}
 
 				//************WRITE TO SERIAL PORT
@@ -172,6 +172,9 @@ void TickFct()
 				CloseHandle(hComm); 
 
 				State = SetOn;
+
+				//TESTING DELAY DELETE LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				delay(100);
 			}
 			else
 			{
@@ -213,10 +216,10 @@ void TickFct()
 			break;
 
 		case SetOff:
-			printf("OFF TEST NO SERIAL YET\r\n");
+			printf("OFF TEST\n");
 
 			//*********OPEN SERIAL PORT
-			/*hComm = CreateFile(_T("COM3"),							//port name
+			hComm = CreateFile(_T("COM3"),							//port name
 								GENERIC_READ | GENERIC_WRITE,		//read/write
 								0,									//no sharing
 								NULL,								//no security
@@ -232,7 +235,37 @@ void TickFct()
 				printf("Serial port opened successfully\n");
 			}
 
+			//************SET PARAMETERS 
+			dcbParameters.DCBlength = sizeof(dcbParameters);
 
+			Status = GetCommState(hComm, &dcbParameters);
+
+			if (Status == FALSE)
+			{
+				printf("Error in GetCommState()\n");
+			}
+			dcbParameters.BaudRate	= CBR_115200;
+			dcbParameters.ByteSize	= 8;
+			dcbParameters.StopBits	= ONESTOPBIT;
+			dcbParameters.Parity	= NOPARITY;
+
+			Status = SetCommState(hComm, &dcbParameters);  //Configuring the port according to settings in DCB 
+			if (Status == FALSE)
+			{
+				printf("Error in Setting DCB Structure\n");
+			}
+
+			//************SET TIMEOUTS
+			timeouts.ReadIntervalTimeout			= 50;
+			timeouts.ReadTotalTimeoutConstant		= 50;
+			timeouts.ReadTotalTimeoutMultiplier		= 10;
+			timeouts.WriteTotalTimeoutConstant		= 50;
+			timeouts.WriteTotalTimeoutMultiplier	= 10;
+
+			if (SetCommTimeouts(hComm, &timeouts) == FALSE)
+			{
+				printf("Error in Setting Time Outs\n");
+			}
 
 			//************WRITE TO SERIAL PORT
 			Status = WriteFile(hComm, 
@@ -251,7 +284,7 @@ void TickFct()
 			}
 
 			//**************CLOSE SERIAL PORT
-			CloseHandle(hComm); */
+			CloseHandle(hComm); 
 			
 			break;
 	} //end second switch
