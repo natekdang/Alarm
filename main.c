@@ -150,7 +150,7 @@ void TickFct()
 					printf("Error in Setting Time Outs\n");
 				}
 
-				//************WRITE TO SERIAL PORT
+				//************WRITE TO SERIAL PORT 
 				Status = WriteFile(hComm, 
 								   onBuffer, 
 								   onBytesToWrite,
@@ -161,8 +161,6 @@ void TickFct()
 				{
 					printf("Serial Write Failure\n");
 				}
-                
-                //delay(60); //TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 
                 //**************SET RECEIVE MASK
                 Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
@@ -183,10 +181,16 @@ void TickFct()
                 {
                     do
                     {
-                        Status = ReadFile(hComm, &tempChar, sizeof(tempChar), &numBytesRead, NULL);
+                        Status = ReadFile(hComm, 
+										  &tempChar, 
+										  sizeof(tempChar), 
+										  &numBytesRead, 
+										  NULL);
+						printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
+
                         SerialBuffer[i] = tempChar;
                         ++i;
-                    } while (tempChar != "\n");
+                    } while (numBytesRead > 0); //(tempChar != '\n');
                 }
                 
                 //**************PRINT TO CONSOLE
@@ -259,10 +263,6 @@ void TickFct()
 			{
 				printf("Error in opening serial port\n"); 
 			}
-			else 
-			{
-				printf("Serial port opened successfully\n");
-			}
 
 			//************SET PARAMETERS 
 			dcbParameters.DCBlength = sizeof(dcbParameters);
@@ -303,18 +303,52 @@ void TickFct()
 							   &offBytesWritten, 
 							   NULL); 
 
-			if (Status == TRUE)
-			{
-				printf("Serial Write Success\n");
-			}
-			else 
+			if (Status == FALSE)
 			{
 				printf("Serial Write Failure\n");
 			}
 
+			//**************SET RECEIVE MASK
+            Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
+                
+            if (Status == FALSE)
+            {
+                printf("Error setting CommMask\n");
+            }
+                
+            //**************SET WaitComm() EVENT
+            Status = WaitCommEvent(hComm, &dwEventMask, NULL); //wait for character
+                
+            if (Status == FALSE)
+            {
+                printf("Error in setting WaitCommEvent()\n");
+            }
+            else //read data
+            {
+                do
+                {
+                    Status = ReadFile(hComm, 
+									  &tempChar, 
+									  sizeof(tempChar), 
+									  &numBytesRead, 
+									  NULL);
+					printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
+
+                    SerialBuffer[i] = tempChar;
+                    ++i;
+                } while (numBytesRead > 0); //(tempChar != '\n');
+            }
+                
+            //**************PRINT TO CONSOLE
+            for (j = 0; j < i - 1; ++j)
+            {
+                printf("%c", SerialBuffer[j]);
+            }
+
 			//**************CLOSE SERIAL PORT
-			CloseHandle(hComm); 
-			
+			CloseHandle(hComm);
+			i = 0; 
+			j = 0; 
 			break;
 	} //end second switch
 }
