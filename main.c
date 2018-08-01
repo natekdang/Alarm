@@ -81,14 +81,20 @@ void TickFct()
 	struct tm *loctime;
 
 	//serial variables
+    int i = 0;
+    int j = 0;
 	HANDLE hComm;
+    char tempChar;
 	char onBuffer[]				= "ON\r";
 	char offBuffer[]			= "OFF\r";
-	BOOL Status; 
+    char SerialBuffer[256];
+	BOOL Status;
+    DWORD dwEventMask;
 	DWORD onBytesToWrite;
 	DWORD onBytesWritten		= 0; 
 	DWORD offBytesToWrite; 
 	DWORD offBytesWritten		= 0;
+    DWORD numBytesRead;
 	DCB dcbParameters			= {0}; 
 	COMMTIMEOUTS timeouts		= {0};
 
@@ -167,9 +173,45 @@ void TickFct()
 				{
 					printf("Serial Write Failure\n");
 				}
+                
+                delay(60); //TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                
+                //**************SET RECEIVE MASK
+                Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
+                
+                if (Status == FALSE)
+                {
+                    printf("Error setting CommMask");
+                }
+                
+                //**************SET WaitComm() EVENT
+                Status = WaitCommEvent(hComm, &dwEventMask, NULL); //wait for character
+                
+                if (Status == FALSE)
+                {
+                    printf("Error in setting WaitCommEvent()");
+                }
+                else //read data
+                {
+                    do
+                    {
+                        Status = ReadFile(hComm, &tempChar, sizeof(tempChar), &numBytesRead, NULL);
+                        SerialBuffer[i] = tempChar;
+                        ++i;
+                    } while (numBytesRead > 0);
+                }
+                
+                //**************PRINT TO CONSOLE
+                for (j = 0; j < i - 1; ++j)
+                {
+                    printf("%c", SerialBuffer[j]);
+                }
+                
 
 				//**************CLOSE SERIAL PORT
-				CloseHandle(hComm); 
+				CloseHandle(hComm);
+                i = 0;
+                j = 0;
 
 				State = SetOn;
 
