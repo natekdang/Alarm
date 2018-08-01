@@ -63,10 +63,6 @@ int compareTimeArray(char array[])
 	{
 		return 1;  
 	}
-	else if (strcmp(array, "123000") == 0) //TEST BRANCH
-	{
-		return 1; 
-	}
 	else 
 	{
 		return 0;
@@ -104,7 +100,7 @@ void TickFct()
 	switch(State)
 	{
 		case Monitor:
-			if (compareTimeArray(array))
+			if (1)//compareTimeArray(array)) //TEST SET TO ALWAYS TRUE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			{
 				count = 0; 
 				printf("ON TEST\n");
@@ -120,10 +116,6 @@ void TickFct()
 				if (hComm == INVALID_HANDLE_VALUE)
 				{
 					printf("Error in opening serial port\n"); 
-				}
-				else 
-				{
-					printf("Serial port opened successfully\n");
 				}
 
 				//************SET PARAMETERS 
@@ -165,23 +157,19 @@ void TickFct()
 								   &onBytesWritten, 
 								   NULL); 
 
-				if (Status == TRUE)
-				{
-					printf("Serial Write Success\n");
-				}
-				else 
+				if (Status == FALSE)
 				{
 					printf("Serial Write Failure\n");
 				}
                 
-                delay(60); //TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //delay(60); //TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 
                 //**************SET RECEIVE MASK
                 Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
                 
                 if (Status == FALSE)
                 {
-                    printf("Error setting CommMask");
+                    printf("Error setting CommMask\n");
                 }
                 
                 //**************SET WaitComm() EVENT
@@ -189,7 +177,7 @@ void TickFct()
                 
                 if (Status == FALSE)
                 {
-                    printf("Error in setting WaitCommEvent()");
+                    printf("Error in setting WaitCommEvent()\n");
                 }
                 else //read data
                 {
@@ -198,7 +186,7 @@ void TickFct()
                         Status = ReadFile(hComm, &tempChar, sizeof(tempChar), &numBytesRead, NULL);
                         SerialBuffer[i] = tempChar;
                         ++i;
-                    } while (numBytesRead > 0);
+                    } while (tempChar != "\n");
                 }
                 
                 //**************PRINT TO CONSOLE
@@ -206,7 +194,6 @@ void TickFct()
                 {
                     printf("%c", SerialBuffer[j]);
                 }
-                
 
 				//**************CLOSE SERIAL PORT
 				CloseHandle(hComm);
@@ -216,7 +203,7 @@ void TickFct()
 				State = SetOn;
 
 				//TESTING DELAY DELETE LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				delay(100);
+				//delay(100);
 			}
 			else
 			{
