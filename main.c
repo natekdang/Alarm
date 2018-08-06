@@ -83,14 +83,14 @@ void TickFct()
     char tempChar;
 	char onBuffer[]				= "ON\r";
 	char offBuffer[]			= "OFF\r";
-    char SerialBuffer[256];
+	char SerialBuffer[256]		= {0};  
 	BOOL Status;
     DWORD dwEventMask;
 	DWORD onBytesToWrite;
 	DWORD onBytesWritten		= 0; 
 	DWORD offBytesToWrite; 
 	DWORD offBytesWritten		= 0;
-    DWORD numBytesRead;
+    DWORD numBytesRead			= 0; //testing if setting to 0 fixes any bugs
 	DCB dcbParameters			= {0}; 
 	COMMTIMEOUTS timeouts		= {0};
 
@@ -333,6 +333,7 @@ void TickFct()
 									  &numBytesRead, 
 									  NULL);
 					printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
+					printf("Num bytes read: %c\n", numBytesRead); 
 
                     SerialBuffer[i] = tempChar;
                     ++i;
