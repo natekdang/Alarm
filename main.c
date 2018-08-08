@@ -117,6 +117,11 @@ void TickFct()
 				{
 					printf("Error in opening serial port\n"); 
 				}
+				else 
+				{
+					printf("Serial port opened successfully\n");
+				}
+
 
 				//************SET PARAMETERS 
 				dcbParameters.DCBlength = sizeof(dcbParameters);
@@ -171,27 +176,37 @@ void TickFct()
                 }
                 
                 //**************SET WaitComm() EVENT
-                Status = WaitCommEvent(hComm, &dwEventMask, NULL); //wait for character
-                
-                if (Status == FALSE)
-                {
-                    printf("Error in setting WaitCommEvent()\n");
-                }
-                else //read data
-                {
-                    do
-                    {
-                        Status = ReadFile(hComm, 
-										  &tempChar, 
-										  sizeof(tempChar), 
-										  &numBytesRead, 
-										  NULL);
-						printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
+				for( ; ; )
+				{
 
-                        SerialBuffer[i] = tempChar;
-                        ++i;
-                    } while (numBytesRead > 0); //(tempChar != '\n');
-                }
+					Status = WaitCommEvent(hComm, &dwEventMask, NULL); //wait for character
+                
+					if (Status == FALSE)
+					{
+						printf("Error in WaitCommEvent()\n");
+						break; 
+					}
+					else //read data
+					{
+						//delay(10); //delay so rest of chars can be sent to serial port first!
+						do
+						{
+							Status = ReadFile(hComm, 
+											  &tempChar, 
+											  sizeof(tempChar), 
+											  &numBytesRead, 
+											  NULL);
+							if (Status == FALSE)
+							{
+								break;
+							}
+							printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
+							SerialBuffer[i] = tempChar;
+							++i;
+						} while (tempChar != '\n');//(numBytesRead);
+						break; //TEST TO FIX INFINITE LOOP
+					}
+				}
                 
                 //**************PRINT TO CONSOLE
                 for (j = 0; j < i - 1; ++j)
@@ -205,10 +220,8 @@ void TickFct()
                 j = 0;
 
 				State = SetOn;
-
-				//TESTING DELAY DELETE LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				//delay(100);
 			}
+
 			else
 			{
 				State = Monitor;
@@ -263,6 +276,10 @@ void TickFct()
 			{
 				printf("Error in opening serial port\n"); 
 			}
+			else 
+			{
+				printf("Serial port opened successfully\n");
+			}
 
 			//************SET PARAMETERS 
 			dcbParameters.DCBlength = sizeof(dcbParameters);
@@ -307,6 +324,10 @@ void TickFct()
 			{
 				printf("Serial Write Failure\n");
 			}
+			else 
+			{
+				printf("Serial Write Success\n");
+			}
 
 			//**************SET RECEIVE MASK
             Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
@@ -325,15 +346,16 @@ void TickFct()
             }
             else //read data
             {
+				printf("Success in setting WaitCommEvent()\n"); //TESTING
                 do
                 {
+
                     Status = ReadFile(hComm, 
 									  &tempChar, 
 									  sizeof(tempChar), 
 									  &numBytesRead, 
 									  NULL);
-					printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
-					printf("Num bytes read: %c\n", numBytesRead); 
+					printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!! 
 
                     SerialBuffer[i] = tempChar;
                     ++i;
