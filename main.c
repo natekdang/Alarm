@@ -63,10 +63,6 @@ int compareTimeArray(char array[])
 	{
 		return 1;  
 	}
-	else if (strcmp(array, "121300") == 0)  
-	{
-		return 1;  
-	}
 	else 
 	{
 		return 0;
@@ -81,8 +77,9 @@ void TickFct()
 	struct tm *loctime;
 
 	//serial variables
-	int i = 0;
-	int j = 0;
+	int i						= 0;
+	int j						= 0;
+	int timer					= 0; 
 	HANDLE hComm;
 	char tempChar				= ' '; 
 	char onBuffer[]				= "ON\r";
@@ -166,7 +163,8 @@ void TickFct()
 				
 				//*************READ SERIAL PORT 
 				tempChar = ' '; //reset tempChar
-				while (tempChar != '\n')
+				timer = 0; 
+				while (tempChar != '\n' && timer < 1000)
 				{
 					ReadFile( hComm, 
 							  &tempChar, 
@@ -178,6 +176,7 @@ void TickFct()
 						SerialBuffer[i] = tempChar;
 						++i;
 					}
+					++timer; 
 				}
                 
                 //**************PRINT TO CONSOLE 
@@ -291,7 +290,8 @@ void TickFct()
 
 			//**************READ SERIAL PORT
 			tempChar = ' '; //reset tempChar
-			while (tempChar != '\n')
+			timer = 0; 
+			while (tempChar != '\n' && timer < 1000)
 			{
 				ReadFile( hComm, 
 						  &tempChar, 
@@ -304,6 +304,7 @@ void TickFct()
 					SerialBuffer[i] = tempChar;
 					++i;
 				}
+				++timer; 
 			}
                  
             //**************PRINT TO CONSOLE
