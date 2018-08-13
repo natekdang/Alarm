@@ -81,10 +81,10 @@ void TickFct()
 	struct tm *loctime;
 
 	//serial variables
-    int i = 0;
-    int j = 0;
+	int i = 0;
+	int j = 0;
 	HANDLE hComm;
-    char tempChar				= ' '; 
+	char tempChar				= ' '; 
 	char onBuffer[]				= "ON\r";
 	char offBuffer[]			= "OFF\r";
 	char SerialBuffer[256]		= {0};  
@@ -93,7 +93,7 @@ void TickFct()
 	DWORD onBytesWritten		= 0; 
 	DWORD offBytesToWrite; 
 	DWORD offBytesWritten		= 0;
-    DWORD numBytesRead			= 0; 
+	DWORD numBytesRead			= 0; 
 	DCB dcbParameters			= {0}; 
 	COMMTIMEOUTS timeouts		= {0};
 
@@ -106,7 +106,6 @@ void TickFct()
 			if (compareTimeArray(array)) 
 			{
 				count = 0; 
-				//printf("ON TEST\n");
 
 				//*********OPEN SERIAL PORT
 				hComm = CreateFile(_T("COM3"),							//port name
@@ -120,11 +119,6 @@ void TickFct()
 				{
 					printf("Error in opening serial port\n"); 
 				}
-				/*else 
-				{
-					printf("Serial port opened successfully\n");
-				} */
-
 
 				//************SET PARAMETERS 
 				dcbParameters.DCBlength = sizeof(dcbParameters);
@@ -169,11 +163,7 @@ void TickFct()
 				{
 					printf("Serial Write Failure\n");
 				}
-				/*else 
-				{
-					printf("Serial Write Success\n");
-				}*/
-
+				
 				//*************READ SERIAL PORT 
 				tempChar = ' '; //reset tempChar
 				while (tempChar != '\n')
@@ -185,26 +175,21 @@ void TickFct()
 							  NULL); 
 					if (numBytesRead == 1)
 					{
-						//printf("Read port success");  
 						SerialBuffer[i] = tempChar;
 						++i;
 					}
-					/*else  TESTING
-					{
-						printf("Failed to read serial port correctly");
-					} */
 				}
                 
                 //**************PRINT TO CONSOLE 
-                for (j = 0; j < i; ++j)			//-1 prevents newline from being printed
-                {									//next message will override the previous
+                for (j = 0; j < i; ++j)				
+                {									
                     printf("%c", SerialBuffer[j]);
                 }
 
 				//**************CLOSE SERIAL PORT
 				CloseHandle(hComm);
-                i = 0;
-                j = 0;
+				i = 0;
+				j = 0;
 
 				State = SetOn;
 			}
@@ -239,18 +224,14 @@ void TickFct()
 			curtime = time(NULL); 
 			loctime = localtime(&curtime); 
 			strftime(array, 7, "%H%M%S", loctime);
-			//printf("The clock time is: %s\n", array);
 			delay(1); 
 			break;
 
 		case SetOn:
 			++count;
-			//printf("%i", count);
 			break;
 
 		case SetOff:
-			//printf("OFF TEST\n");
-
 			//*********OPEN SERIAL PORT
 			hComm = CreateFile(_T("COM3"),							//port name
 								GENERIC_READ | GENERIC_WRITE,		//read/write
@@ -263,10 +244,6 @@ void TickFct()
 			{
 				printf("Error in opening serial port\n"); 
 			}
-			/*else 
-			{
-				printf("Serial port opened successfully\n");
-			} */
 
 			//************SET PARAMETERS 
 			dcbParameters.DCBlength = sizeof(dcbParameters);
@@ -311,10 +288,6 @@ void TickFct()
 			{
 				printf("Serial Write Failure\n");
 			}
-			/*else 
-			{
-				printf("Serial Write Success\n");
-			} */
 
 			//**************READ SERIAL PORT
 			tempChar = ' '; //reset tempChar
