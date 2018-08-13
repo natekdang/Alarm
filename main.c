@@ -215,6 +215,10 @@ void TickFct()
 		case SetOff:
 			State = Monitor; 
 			break;
+
+		default: 
+			State = Monitor; 
+			break; 
 	} //end first switch
 
 	switch(State)
@@ -318,6 +322,10 @@ void TickFct()
 			i = 0; 
 			j = 0; 
 			break;
+
+		default: 
+			State = Monitor;
+			break; 
 	} //end second switch
 }
 
