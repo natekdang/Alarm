@@ -80,7 +80,7 @@ void TickFct()
     int i = 0;
     int j = 0;
 	HANDLE hComm;
-    char tempChar;
+    char tempChar				= ' '; 
 	char onBuffer[]				= "ON\r";
 	char offBuffer[]			= "OFF\r";
 	char SerialBuffer[256]		= {0};  
@@ -166,29 +166,24 @@ void TickFct()
 				{
 					printf("Serial Write Failure\n");
 				}
+				else 
+				{
+					printf("Write Success");
+				}
                 
                 //**************SET RECEIVE MASK
-                Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
+               /* Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
                 
                 if (Status == FALSE)
                 {
                     printf("Error setting CommMask\n");
-                }
+                } */
                 
                 //**************SET WaitComm() EVENT
-				for( ; ; )
+				/*for( ; ; )
 				{
-
-					Status = WaitCommEvent(hComm, &dwEventMask, NULL); //wait for character
-                
-					if (Status == FALSE)
+					if (WaitCommEvent(hComm, &dwEventMask, NULL))
 					{
-						printf("Error in WaitCommEvent()\n");
-						break; 
-					}
-					else //read data
-					{
-						//delay(10); //delay so rest of chars can be sent to serial port first!
 						do
 						{
 							Status = ReadFile(hComm, 
@@ -204,8 +199,34 @@ void TickFct()
 							SerialBuffer[i] = tempChar;
 							++i;
 						} while (tempChar != '\n');//(numBytesRead);
-						break; //TEST TO FIX INFINITE LOOP
+					} //if 
+                
+					else
+					{
+						printf("Error in WaitCommEvent()\n");
+						break; 
 					}
+
+					break; //fix infinite loop 
+				} //for */
+
+				while (tempChar != '\n')
+				{
+					ReadFile( hComm, 
+							  &tempChar, 
+							  sizeof(tempChar), 
+							  &numBytesRead, 
+							  NULL); 
+					if (numBytesRead == 1)
+					{
+						printf("Read port success");  
+						SerialBuffer[i] = tempChar;
+						++i;
+					}
+					/*else  TESTING
+					{
+						printf("Failed to read serial port correctly");
+					} */
 				}
                 
                 //**************PRINT TO CONSOLE
