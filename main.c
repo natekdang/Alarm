@@ -63,6 +63,10 @@ int compareTimeArray(char array[])
 	{
 		return 1;  
 	}
+	else if (strcmp(array, "114400") == 0)  
+	{
+		return 1;  
+	}
 	else 
 	{
 		return 0;
@@ -85,12 +89,11 @@ void TickFct()
 	char offBuffer[]			= "OFF\r";
 	char SerialBuffer[256]		= {0};  
 	BOOL Status;
-    DWORD dwEventMask;
 	DWORD onBytesToWrite;
 	DWORD onBytesWritten		= 0; 
 	DWORD offBytesToWrite; 
 	DWORD offBytesWritten		= 0;
-    DWORD numBytesRead			= 0; //testing if setting to 0 fixes any bugs
+    DWORD numBytesRead			= 0; 
 	DCB dcbParameters			= {0}; 
 	COMMTIMEOUTS timeouts		= {0};
 
@@ -100,7 +103,7 @@ void TickFct()
 	switch(State)
 	{
 		case Monitor:
-			if (1)//compareTimeArray(array)) //TEST SET TO ALWAYS TRUE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			if (compareTimeArray(array)) 
 			{
 				count = 0; 
 				printf("ON TEST\n");
@@ -158,7 +161,7 @@ void TickFct()
 				//************WRITE TO SERIAL PORT 
 				Status = WriteFile(hComm, 
 								   onBuffer, 
-								   onBytesToWrite,
+								   onBytesToWrite - 1, //don't write '/0'
 								   &onBytesWritten, 
 								   NULL); 
 
@@ -170,46 +173,9 @@ void TickFct()
 				{
 					printf("Write Success");
 				}
-                
-                //**************SET RECEIVE MASK
-               /* Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
-                
-                if (Status == FALSE)
-                {
-                    printf("Error setting CommMask\n");
-                } */
-                
-                //**************SET WaitComm() EVENT
-				/*for( ; ; )
-				{
-					if (WaitCommEvent(hComm, &dwEventMask, NULL))
-					{
-						do
-						{
-							Status = ReadFile(hComm, 
-											  &tempChar, 
-											  sizeof(tempChar), 
-											  &numBytesRead, 
-											  NULL);
-							if (Status == FALSE)
-							{
-								break;
-							}
-							printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!!
-							SerialBuffer[i] = tempChar;
-							++i;
-						} while (tempChar != '\n');//(numBytesRead);
-					} //if 
-                
-					else
-					{
-						printf("Error in WaitCommEvent()\n");
-						break; 
-					}
 
-					break; //fix infinite loop 
-				} //for */
-
+				//*************READ SERIAL PORT 
+				tempChar = ' '; //reset tempChar
 				while (tempChar != '\n')
 				{
 					ReadFile( hComm, 
@@ -219,7 +185,7 @@ void TickFct()
 							  NULL); 
 					if (numBytesRead == 1)
 					{
-						printf("Read port success");  
+						//printf("Read port success");  
 						SerialBuffer[i] = tempChar;
 						++i;
 					}
@@ -250,7 +216,7 @@ void TickFct()
 			break;
 
 		case SetOn:
-			if (count < 15)
+			if (count < 15) 
 			{
 				delay(1);
 				State = SetOn;
@@ -337,7 +303,7 @@ void TickFct()
 			//************WRITE TO SERIAL PORT
 			Status = WriteFile(hComm, 
 							   offBuffer, 
-							   offBytesToWrite,
+							   offBytesToWrite - 1,
 							   &offBytesWritten, 
 							   NULL); 
 
@@ -350,44 +316,28 @@ void TickFct()
 				printf("Serial Write Success\n");
 			}
 
-			//**************SET RECEIVE MASK
-            Status = SetCommMask(hComm, EV_RXCHAR); //monitor for characters
-                
-            if (Status == FALSE)
-            {
-                printf("Error setting CommMask\n");
-            }
-                
-            //**************SET WaitComm() EVENT
-            Status = WaitCommEvent(hComm, &dwEventMask, NULL); //wait for character
-                
-            if (Status == FALSE)
-            {
-                printf("Error in setting WaitCommEvent()\n");
-            }
-            else //read data
-            {
-				printf("Success in setting WaitCommEvent()\n"); //TESTING
-                do
-                {
-
-                    Status = ReadFile(hComm, 
-									  &tempChar, 
-									  sizeof(tempChar), 
-									  &numBytesRead, 
-									  NULL);
-					printf("Char read: %c\n", tempChar);  //TESTING!!!!!!!!!!!! 
-
-                    SerialBuffer[i] = tempChar;
-                    ++i;
-                } while (numBytesRead > 0); //(tempChar != '\n');
-            }
-                
+			//**************READ SERIAL PORT
+			tempChar = ' '; //reset tempChar
+			while (tempChar != '\n')
+			{
+				ReadFile( hComm, 
+						  &tempChar, 
+						  sizeof(tempChar), 
+						  &numBytesRead, 
+						  NULL); 
+				if (numBytesRead == 1)
+				{
+					//printf("Read port success");  
+					SerialBuffer[i] = tempChar;
+					++i;
+				}
+			}
+                 
             //**************PRINT TO CONSOLE
             for (j = 0; j < i - 1; ++j)
             {
                 printf("%c", SerialBuffer[j]);
-            }
+            } 
 
 			//**************CLOSE SERIAL PORT
 			CloseHandle(hComm);
