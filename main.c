@@ -63,7 +63,7 @@ int compareTimeArray(char array[])
 	{
 		return 1;  
 	}
-	else if (strcmp(array, "114400") == 0)  
+	else if (strcmp(array, "121300") == 0)  
 	{
 		return 1;  
 	}
@@ -106,7 +106,7 @@ void TickFct()
 			if (compareTimeArray(array)) 
 			{
 				count = 0; 
-				printf("ON TEST\n");
+				//printf("ON TEST\n");
 
 				//*********OPEN SERIAL PORT
 				hComm = CreateFile(_T("COM3"),							//port name
@@ -120,10 +120,10 @@ void TickFct()
 				{
 					printf("Error in opening serial port\n"); 
 				}
-				else 
+				/*else 
 				{
 					printf("Serial port opened successfully\n");
-				}
+				} */
 
 
 				//************SET PARAMETERS 
@@ -169,10 +169,10 @@ void TickFct()
 				{
 					printf("Serial Write Failure\n");
 				}
-				else 
+				/*else 
 				{
-					printf("Write Success");
-				}
+					printf("Serial Write Success\n");
+				}*/
 
 				//*************READ SERIAL PORT 
 				tempChar = ' '; //reset tempChar
@@ -195,9 +195,9 @@ void TickFct()
 					} */
 				}
                 
-                //**************PRINT TO CONSOLE
-                for (j = 0; j < i - 1; ++j)
-                {
+                //**************PRINT TO CONSOLE 
+                for (j = 0; j < i; ++j)			//-1 prevents newline from being printed
+                {									//next message will override the previous
                     printf("%c", SerialBuffer[j]);
                 }
 
@@ -249,7 +249,7 @@ void TickFct()
 			break;
 
 		case SetOff:
-			printf("OFF TEST\n");
+			//printf("OFF TEST\n");
 
 			//*********OPEN SERIAL PORT
 			hComm = CreateFile(_T("COM3"),							//port name
@@ -263,10 +263,10 @@ void TickFct()
 			{
 				printf("Error in opening serial port\n"); 
 			}
-			else 
+			/*else 
 			{
 				printf("Serial port opened successfully\n");
-			}
+			} */
 
 			//************SET PARAMETERS 
 			dcbParameters.DCBlength = sizeof(dcbParameters);
@@ -311,10 +311,10 @@ void TickFct()
 			{
 				printf("Serial Write Failure\n");
 			}
-			else 
+			/*else 
 			{
 				printf("Serial Write Success\n");
-			}
+			} */
 
 			//**************READ SERIAL PORT
 			tempChar = ' '; //reset tempChar
@@ -334,7 +334,7 @@ void TickFct()
 			}
                  
             //**************PRINT TO CONSOLE
-            for (j = 0; j < i - 1; ++j)
+            for (j = 0; j < i; ++j)
             {
                 printf("%c", SerialBuffer[j]);
             } 
