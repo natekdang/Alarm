@@ -311,10 +311,10 @@ void TickFct()
 			}
                  
             //**************PRINT TO CONSOLE
-            for (j = 0; j < i; ++j)
-            {
-                printf("%c", SerialBuffer[j]);
-            } 
+			for (j = 0; j < i; ++j)
+			{
+				printf("%c", SerialBuffer[j]);
+			} 
 
 			//**************CLOSE SERIAL PORT
 			CloseHandle(hComm);
